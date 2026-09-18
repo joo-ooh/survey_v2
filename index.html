@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설문조사 웹 애플리케이션</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc8fc',
+                            400: '#36b0fa',
+                            500: '#0ca0eb',
+                            600: '#007fca',
+                            700: '#0166a5',
+                            800: '#065688',
+                            900: '#0b4770',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth View Transitions & Custom Scrollbar */
+        .page-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-brand-100 selection:text-brand-700">
+
+    <!-- Header Navigation Bar -->
+    <header class="w-full bg-white/80 backdrop-blur-md border-b border-slate-100 fixed top-0 left-0 z-30 transition-all duration-200">
+        <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="navigateTo('landing')">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-300 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid me-0.5 fa-clipboard-question text-sm"></i>
+                </div>
+                <span class="font-bold text-slate-800 tracking-tight text-base">QuickSurvey</span>
+            </div>
+            <button onclick="navigateTo('results')" class="text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>결과 보기</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-md mx-auto pt-20 pb-10 px-4 flex-1 flex flex-col justify-center">
+
+        <!-- 1. LANDING SCREEN -->
+        <section id="screen-landing" class="page-transition space-y-6 text-center py-4">
+            <div class="relative inline-block">
+                <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-brand-100 to-brand-200 text-brand-600 flex items-center justify-center shadow-inner mb-2 transform transition hover:scale-105 duration-300">
+                    <i class="fa-solid fa-square-poll-vertical text-5xl"></i>
+                </div>
+                <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-brand-500"></span>
+                </span>
+            </div>
+
+            <div class="space-y-2">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">설문조사 해주세요!</h1>
+                <p class="text-slate-500 text-sm leading-relaxed max-w-xs mx-auto">
+                    여러분의 소중한 의견을 모으고 있습니다.<br>약 1분 정도면 작성하실 수 있어요.
+                </p>
+            </div>
+
+            <div class="pt-4 space-y-3">
+                <button onclick="startSurvey()" class="w-full py-4 px-6 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold rounded-2xl shadow-lg shadow-brand-500/30 transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-base">
+                    <span>설문조사 하기</span>
+                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                </button>
+                <button onclick="navigateTo('results')" class="w-full py-3.5 px-6 bg-white hover:bg-slate-100 text-slate-700 font-medium rounded-2xl border border-slate-200 shadow-sm transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-chart-column text-slate-400"></i>
+                    <span>응답 결과만 확인하기</span>
+                </button>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-center gap-4">
+                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 소요시간 1분</span>
+                <span>•</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-user-shield"></i> 익명 보장</span>
+            </div>
+        </section>
+
+
+        <!-- 2. SURVEY FORM SCREEN -->
+        <section id="screen-survey" class="page-transition hidden space-y-6">
+            <!-- Progress Bar Header -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
+                <div class="flex justify-between items-center text-xs font-semibold">
+                    <span class="text-brand-600" id="progress-text">설문 작성 중</span>
+                    <span class="text-slate-400" id="progress-percent">0% 완료</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-brand-400 to-brand-600 h-full w-0 transition-all duration-300 ease-out rounded-full"></div>
+                </div>
+            </div>
+
+            <form id="survey-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                <!-- Q1: Gender -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-brand-100 text-brand-600 text-xs font-bold flex items-center justify-center">1</span>
+                        <h2 class="font-bold text-slate-800 text-base">성별을 선택해주세요. <span class="text-rose-500">*</span></h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <label class="gender-card cursor-pointer border-2 border-slate-100 rounded-xl p-3.5 flex items-center justify-center gap-2 transition-all hover:border-brand-300">
+                            <input type="radio" name="gender" value="남성" class="hidden" onchange="updateProgress(); highlightSelection(this, 'gender')">
+                            <i class="fa-solid fa-mars text-blue-500 text-lg"></i>
+                            <span class="font-medium text-sm text-slate-700">남성</span>
+                        </label>
+                        <label class="gender-card cursor-pointer border-2 border-slate-100 rounded-xl p-3.5 flex items-center justify-center gap-2 transition-all hover:border-brand-300">
+                            <input type="radio" name="gender" value="여성" class="hidden" onchange="updateProgress(); highlightSelection(this, 'gender')">
+                            <i class="fa-solid fa-venus text-pink-500 text-lg"></i>
+                            <span class="font-medium text-sm text-slate-700">여성</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q2: Age Group -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-brand-100 text-brand-600 text-xs font-bold flex items-center justify-center">2</span>
+                        <h2 class="font-bold text-slate-800 text-base">본인이 속한 나이대를 선택해주세요. <span class="text-rose-500">*</span></h2>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="0~8" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">0 ~ 8세</span>
+                        </label>
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="9~13" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">9 ~ 13세</span>
+                        </label>
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="14~16" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">14 ~ 16세</span>
+                        </label>
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="17~19" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">17 ~ 19세</span>
+                        </label>
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="20~24" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">20 ~ 24세</span>
+                        </label>
+                        <label class="age-card cursor-pointer border-2 border-slate-100 rounded-xl p-3 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="age" value="성인" class="hidden" onchange="updateProgress(); highlightSelection(this, 'age')">
+                            <span class="font-medium text-sm text-slate-700 block">성인</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q3: Privacy Agreement -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-brand-100 text-brand-600 text-xs font-bold flex items-center justify-center">3</span>
+                        <h2 class="font-bold text-slate-800 text-base">개인정보 수집동의 여부를 선택해주세요. <span class="text-rose-500">*</span></h2>
+                    </div>
+                    
+                    <!-- Scrollable Terms Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-600 space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
+                        <p class="font-semibold text-slate-700">[개인정보 수집 및 이용 안내]</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-500">
+                            <li><strong class="text-slate-600">수집 목적:</strong> 설문 결과 분석 및 통계 자료 작성</li>
+                            <li><strong class="text-slate-600">수집 항목:</strong> 성별, 연령대 정보</li>
+                            <li><strong class="text-slate-600">보유 및 이용기간:</strong> 설문 데이터 통계 집계 완료 시 즉시 파기</li>
+                        </ul>
+                        <p class="text-[11px] text-slate-400 pt-1">※ 귀하는 개인정보 수집 동의를 거부할 권리가 있으나, 거부 시 설문 참여가 제한될 수 있습니다.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <label class="privacy-card cursor-pointer border-2 border-slate-100 rounded-xl p-3.5 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="privacy" value="동의함" class="hidden" onchange="updateProgress(); highlightSelection(this, 'privacy')">
+                            <span class="font-medium text-sm text-slate-700">동의한다.</span>
+                        </label>
+                        <label class="privacy-card cursor-pointer border-2 border-slate-100 rounded-xl p-3.5 text-center transition-all hover:border-brand-300">
+                            <input type="radio" name="privacy" value="동의안함" class="hidden" onchange="updateProgress(); highlightSelection(this, 'privacy')">
+                            <span class="font-medium text-sm text-slate-700">동의하지 않는다.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="navigateTo('landing')" class="w-1/3 py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-600 font-medium rounded-xl border border-slate-200 shadow-sm active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                        <span>돌아가기</span>
+                    </button>
+                    <button type="submit" class="w-2/3 py-3.5 px-4 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2">
+                        <span>제출하기</span>
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+
+        <!-- 3. RESULTS SCREEN -->
+        <section id="screen-results" class="page-transition hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">설문조사 결과</h2>
+                        <p class="text-xs text-slate-400">실시간 수집된 통계 요약입니다.</p>
+                    </div>
+                    <!-- '총 X명 참여' interactive button -->
+                    <button onclick="navigateTo('history')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold text-xs px-3 py-1.5 rounded-full border border-brand-200 transition-all flex items-center gap-1 group shadow-sm">
+                        <span id="total-count-badge">총 0명 참여</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                    </button>
+                </div>
+
+                <!-- Gender Distribution Chart Card -->
+                <div class="space-y-3 pt-1">
+                    <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-users text-brand-500"></i> 성별 분포
+                    </h3>
+                    <div class="space-y-2" id="gender-results-container">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Age Distribution Chart Card -->
+                <div class="space-y-3">
+                    <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-cake-candles text-brand-500"></i> 연령대 분포
+                    </h3>
+                    <div class="space-y-2.5" id="age-results-container">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Privacy Distribution Chart Card -->
+                <div class="space-y-3">
+                    <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-brand-500"></i> 개인정보 수집 동의 분포
+                    </h3>
+                    <div class="space-y-2.5" id="privacy-results-container">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="space-y-2.5">
+                <button onclick="navigateTo('history')" class="w-full py-3.5 px-6 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl shadow-md active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-table-list text-xs"></i>
+                    <span>응답 히스토리 표로 보기</span>
+                </button>
+                <button onclick="navigateTo('landing')" class="w-full py-3.5 px-6 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl shadow-md active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-house text-xs"></i>
+                    <span>첫 화면으로 돌아가기</span>
+                </button>
+                <button onclick="resetData()" class="w-full py-2.5 px-4 text-xs font-medium text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                    <span>로컬스토리지 데이터 초기화</span>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- 4. HISTORY TABLE SCREEN -->
+        <section id="screen-history" class="page-transition hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">응답 내역 히스토리</h2>
+                        <p class="text-xs text-slate-400">제출된 설문 데이터 개별 기록입니다.</p>
+                    </div>
+                    <span id="history-total-count" class="bg-slate-100 text-slate-600 font-bold text-xs px-2.5 py-1 rounded-full">
+                        0건
+                    </span>
+                </div>
+
+                <!-- History Table Container -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-xs text-left text-slate-600">
+                        <thead class="text-[11px] text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th scope="col" class="px-3 py-2.5 text-center">#</th>
+                                <th scope="col" class="px-3 py-2.5">제출 시간</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">성별</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">나이대</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">개인정보 동의</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-100">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="space-y-2.5">
+                <button onclick="navigateTo('results')" class="w-full py-3.5 px-6 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl shadow-md active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                    <span>결과 요약으로 돌아가기</span>
+                </button>
+                <button onclick="navigateTo('landing')" class="w-full py-3.5 px-6 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl shadow-md active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-house text-xs"></i>
+                    <span>첫 화면으로 돌아가기</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-slate-400">
+        &copy; QuickSurvey. All rights reserved.
+    </footer>
+
+    <!-- Custom Modal Dialog -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 text-center">
+            <div id="modal-icon-wrapper" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-1">
+                <i id="modal-icon" class="fa-solid fa-check"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900">알림</h3>
+                <p id="modal-message" class="text-sm text-slate-500 leading-relaxed"></p>
+            </div>
+            <button id="modal-confirm-btn" onclick="closeModal()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all text-sm">
+                확인
+            </button>
+        </div>
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Default Mock Data for rich visual stats when starting
+        const DEFAULT_MOCK_DATA = [
+            { gender: '남성', age: '20~24', privacy: '동의함', timestamp: '2026-03-20 14:22:01' },
+            { gender: '여성', age: '성인', privacy: '동의함', timestamp: '2026-03-20 14:35:12' },
+            { gender: '여성', age: '17~19', privacy: '동의안함', timestamp: '2026-03-20 15:01:40' },
+            { gender: '남성', age: '성인', privacy: '동의함', timestamp: '2026-03-20 15:18:22' },
+            { gender: '여성', age: '20~24', privacy: '동의함', timestamp: '2026-03-20 16:05:09' },
+            { gender: '남성', age: '14~16', privacy: '동의안함', timestamp: '2026-03-20 16:42:30' },
+            { gender: '여성', age: '성인', privacy: '동의함', timestamp: '2026-03-20 17:11:00' },
+            { gender: '남성', age: '9~13', privacy: '동의함', timestamp: '2026-03-20 18:20:15' }
+        ];
+
+        // Retrieve local storage or initialize
+        function getSurveyData() {
+            const data = localStorage.getItem('quick_survey_responses');
+            if (!data) {
+                localStorage.setItem('quick_survey_responses', JSON.stringify(DEFAULT_MOCK_DATA));
+                return DEFAULT_MOCK_DATA;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveSurveyResponse(response) {
+            const currentData = getSurveyData();
+            currentData.push(response);
+            localStorage.setItem('quick_survey_responses', JSON.stringify(currentData));
+        }
+
+        function navigateTo(screenId) {
+            const screens = ['landing', 'survey', 'results', 'history'];
+            
+            screens.forEach(id => {
+                const el = document.getElementById(`screen-${id}`);
+                if (id === screenId) {
+                    el.classList.remove('hidden');
+                    setTimeout(() => {
+                        el.classList.remove('opacity-0', 'translate-y-2');
+                    }, 20);
+                } else {
+                    el.classList.add('opacity-0', 'translate-y-2');
+                    el.classList.add('hidden');
+                }
+            });
+
+            if (screenId === 'results') {
+                renderResults();
+            } else if (screenId === 'history') {
+                renderHistoryTable();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startSurvey() {
+            resetForm();
+            navigateTo('survey');
+        }
+
+        function highlightSelection(inputEl, category) {
+            const name = inputEl.name;
+            const labels = document.querySelectorAll(`input[name="${name}"]`);
+            
+            labels.forEach(radio => {
+                const card = radio.closest('label');
+                if (radio.checked) {
+                    card.classList.add('border-brand-500', 'bg-brand-50/50', 'ring-2', 'ring-brand-500/20');
+                    card.classList.remove('border-slate-100');
+                } else {
+                    card.classList.remove('border-brand-500', 'bg-brand-50/50', 'ring-2', 'ring-brand-500/20');
+                    card.classList.add('border-slate-100');
+                }
+            });
+        }
+
+        function updateProgress() {
+            const form = document.getElementById('survey-form');
+            const genderSelected = form.querySelector('input[name="gender"]:checked');
+            const ageSelected = form.querySelector('input[name="age"]:checked');
+            const privacySelected = form.querySelector('input[name="privacy"]:checked');
+
+            let answeredCount = 0;
+            if (genderSelected) answeredCount++;
+            if (ageSelected) answeredCount++;
+            if (privacySelected) answeredCount++;
+
+            const percentage = Math.round((answeredCount / 3) * 100);
+            
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            progressBar.style.width = `${percentage}%`;
+            progressPercent.innerText = `${percentage}% 완료`;
+        }
+
+        function resetForm() {
+            const form = document.getElementById('survey-form');
+            form.reset();
+            
+            // Remove selection styles
+            document.querySelectorAll('#survey-form label').forEach(card => {
+                card.classList.remove('border-brand-500', 'bg-brand-50/50', 'ring-2', 'ring-brand-500/20');
+                card.classList.add('border-slate-100');
+            });
+
+            updateProgress();
+        }
+
+        let onModalCloseCallback = null;
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('survey-form');
+            const genderEl = form.querySelector('input[name="gender"]:checked');
+            const ageEl = form.querySelector('input[name="age"]:checked');
+            const privacyEl = form.querySelector('input[name="privacy"]:checked');
+
+            // Validation checks
+            if (!genderEl) {
+                showModal('경고', '1번 질문(성별)을 선택해주세요.', 'warning');
+                return;
+            }
+            if (!ageEl) {
+                showModal('경고', '2번 질문(나이대)을 선택해주세요.', 'warning');
+                return;
+            }
+            if (!privacyEl) {
+                showModal('경고', '3번 질문(개인정보 수집동의)을 선택해주세요.', 'warning');
+                return;
+            }
+
+            const now = new Date();
+            const formattedTimestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+            // Save Response (동의하지 않는다를 선택해도 제출 가능)
+            const responseData = {
+                gender: genderEl.value,
+                age: ageEl.value,
+                privacy: privacyEl.value,
+                timestamp: formattedTimestamp
+            };
+
+            saveSurveyResponse(responseData);
+
+            showModal('제출 완료!', '성공적으로 설문 응답이 전달되었습니다. 참여해주셔서 감사합니다.', 'success', () => {
+                resetForm();
+                navigateTo('landing');
+            });
+        }
+
+        function renderResults() {
+            const surveyData = getSurveyData();
+            const total = surveyData.length;
+
+            document.getElementById('total-count-badge').innerText = `총 ${total}명 참여`;
+
+            // 1. Gender Stats
+            const genderCounts = { '남성': 0, '여성': 0 };
+            surveyData.forEach(item => {
+                if (genderCounts[item.gender] !== undefined) {
+                    genderCounts[item.gender]++;
+                }
+            });
+
+            const genderContainer = document.getElementById('gender-results-container');
+            genderContainer.innerHTML = '';
+
+            const genderColors = {
+                '남성': { bg: 'bg-blue-500', text: 'text-blue-600' },
+                '여성': { bg: 'bg-pink-500', text: 'text-pink-600' }
+            };
+
+            Object.keys(genderCounts).forEach(gender => {
+                const count = genderCounts[gender];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const style = genderColors[gender] || { bg: 'bg-brand-500', text: 'text-brand-600' };
+
+                const row = document.createElement('div');
+                row.className = 'space-y-1';
+                row.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-700">${gender}</span>
+                        <span class="${style.text}">${count}명 (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                        <div class="${style.bg} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                genderContainer.appendChild(row);
+            });
+
+            // 2. Age Stats
+            const ageCategories = ['0~8', '9~13', '14~16', '17~19', '20~24', '성인'];
+            const ageCounts = {};
+            ageCategories.forEach(cat => ageCounts[cat] = 0);
+
+            surveyData.forEach(item => {
+                if (ageCounts[item.age] !== undefined) {
+                    ageCounts[item.age]++;
+                }
+            });
+
+            const ageContainer = document.getElementById('age-results-container');
+            ageContainer.innerHTML = '';
+
+            ageCategories.forEach(age => {
+                const count = ageCounts[age];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+                const row = document.createElement('div');
+                row.className = 'space-y-1';
+                row.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium">
+                        <span class="text-slate-600">${age}${age === '성인' ? '' : '세'}</span>
+                        <span class="text-slate-500 font-semibold">${count}명 (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-brand-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                ageContainer.appendChild(row);
+            });
+
+            // 3. Privacy Consent Stats
+            const privacyCounts = { '동의함': 0, '동의안함': 0 };
+            surveyData.forEach(item => {
+                if (privacyCounts[item.privacy] !== undefined) {
+                    privacyCounts[item.privacy]++;
+                }
+            });
+
+            const privacyContainer = document.getElementById('privacy-results-container');
+            privacyContainer.innerHTML = '';
+
+            const privacyStyles = {
+                '동의함': { label: '동의함', bg: 'bg-emerald-500', text: 'text-emerald-600' },
+                '동의안함': { label: '동의하지 않음', bg: 'bg-amber-500', text: 'text-amber-600' }
+            };
+
+            Object.keys(privacyCounts).forEach(key => {
+                const count = privacyCounts[key];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const style = privacyStyles[key];
+
+                const row = document.createElement('div');
+                row.className = 'space-y-1';
+                row.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium">
+                        <span class="text-slate-600">${style.label}</span>
+                        <span class="${style.text} font-semibold">${count}명 (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="${style.bg} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                privacyContainer.appendChild(row);
+            });
+        }
+
+        function renderHistoryTable() {
+            const surveyData = getSurveyData();
+            const tbody = document.getElementById('history-table-body');
+            document.getElementById('history-total-count').innerText = `${surveyData.length}건`;
+
+            tbody.innerHTML = '';
+
+            if (surveyData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-3 py-6 text-center text-slate-400">제출된 설문 응답 내역이 없습니다.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Display in reverse chronological order (newest first)
+            surveyData.slice().reverse().forEach((item, idx) => {
+                const originalIndex = surveyData.length - idx;
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 transition-colors';
+
+                const privacyBadge = item.privacy === '동의함' 
+                    ? `<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">동의</span>`
+                    : `<span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full border border-amber-200">미동의</span>`;
+
+                const timeText = item.timestamp ? item.timestamp : '-';
+
+                row.innerHTML = `
+                    <td class="px-3 py-3 text-center font-bold text-slate-400">${originalIndex}</td>
+                    <td class="px-3 py-3 text-slate-500 whitespace-nowrap">${timeText}</td>
+                    <td class="px-3 py-3 text-center font-medium text-slate-700">${item.gender}</td>
+                    <td class="px-3 py-3 text-center font-medium text-slate-700">${item.age}${item.age === '성인' ? '' : '세'}</td>
+                    <td class="px-3 py-3 text-center">${privacyBadge}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showModal(title, message, type = 'info', onClose = null) {
+            const backdrop = document.getElementById('modal-backdrop');
+            const modalContent = document.getElementById('modal-content');
+            const iconWrapper = document.getElementById('modal-icon-wrapper');
+            const icon = document.getElementById('modal-icon');
+
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            onModalCloseCallback = onClose;
+
+            // Type styles
+            iconWrapper.className = 'w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl mb-1 ';
+            if (type === 'success') {
+                iconWrapper.classList.add('bg-emerald-100', 'text-emerald-600');
+                icon.className = 'fa-solid fa-check';
+            } else if (type === 'warning') {
+                iconWrapper.classList.add('bg-amber-100', 'text-amber-600');
+                icon.className = 'fa-solid fa-exclamation';
+            } else {
+                iconWrapper.classList.add('bg-brand-100', 'text-brand-600');
+                icon.className = 'fa-solid fa-info';
+            }
+
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const backdrop = document.getElementById('modal-backdrop');
+            const modalContent = document.getElementById('modal-content');
+
+            backdrop.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+                if (onModalCloseCallback) {
+                    onModalCloseCallback();
+                    onModalCloseCallback = null;
+                }
+            }, 200);
+        }
+
+        function resetData() {
+            if (confirm('로컬스토리지 데이터를 가상 초기 샘플 데이터로 다시 되돌리시겠습니까?')) {
+                localStorage.removeItem('quick_survey_responses');
+                renderResults();
+            }
+        }
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            getSurveyData(); // Initialize localstorage mock data
+        });
+    </script>
+</body>
+</html>
