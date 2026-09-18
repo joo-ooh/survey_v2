@@ -64,10 +64,18 @@
 
       <form id="survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-8">
         
-        <!-- Q1. 성별 -->
+        <!-- Q1. 이름 -->
         <div class="space-y-3">
           <label class="block text-base font-bold text-slate-900">
-            1. 성별을 선택해주세요. <span class="text-red-500">*</span>
+            1. 이름을 입력해주세요. <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="userName" name="userName" placeholder="이름을 입력하세요" oninput="updateProgress()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-all text-slate-800 font-medium placeholder:text-slate-300">
+        </div>
+
+        <!-- Q2. 성별 -->
+        <div class="space-y-3">
+          <label class="block text-base font-bold text-slate-900">
+            2. 성별을 선택해주세요. <span class="text-red-500">*</span>
           </label>
           <div class="grid grid-cols-2 gap-3">
             <label class="cursor-pointer">
@@ -85,10 +93,10 @@
           </div>
         </div>
 
-        <!-- Q2. 나이대 -->
+        <!-- Q3. 나이대 -->
         <div class="space-y-3">
           <label class="block text-base font-bold text-slate-900">
-            2. 본인이 속한 나이대를 선택해주세요. <span class="text-red-500">*</span>
+            3. 본인이 속한 나이대를 선택해주세요. <span class="text-red-500">*</span>
           </label>
           <div class="grid grid-cols-3 gap-2 sm:gap-3">
             <label class="cursor-pointer">
@@ -130,16 +138,16 @@
           </div>
         </div>
 
-        <!-- Q3. 개인정보 수집동의 -->
+        <!-- Q4. 개인정보 수집동의 -->
         <div class="space-y-3">
           <label class="block text-base font-bold text-slate-900">
-            3. 개인정보 수집동의 여부를 선택해주세요. <span class="text-red-500">*</span>
+            4. 개인정보 수집동의 여부를 선택해주세요. <span class="text-red-500">*</span>
           </label>
           
           <!-- 약관 내용 박스 -->
           <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-500 h-24 overflow-y-auto leading-relaxed">
             <p class="font-semibold text-slate-700 mb-1">[개인정보 수집 및 이용 안내]</p>
-            1. 수집 항목: 성별, 연령대 정보<br>
+            1. 수집 항목: 이름, 성별, 연령대 정보<br>
             2. 수집 및 이용 목적: 통계 집계 및 서비스 개선 참고 자료 활용<br>
             3. 보유 및 이용 기간: 설문 조사 종료 및 결과 집계 완료 시 즉시 파기<br>
             * 귀하는 개인정보 수집에 동의하지 않을 권리가 있으며, 동의하지 않더라도 설문에 응하실 수 있습니다.
@@ -180,12 +188,21 @@
           <h2 class="text-xl font-bold text-slate-900">설문 결과 요약</h2>
           <p class="text-xs text-slate-400 mt-0.5">실시간으로 응답 통계를 확인하실 수 있습니다.</p>
         </div>
-        <!-- 클릭 가능한 참여 인원 버튼 -->
-        <button onclick="renderHistoryTable(); goToScreen('screen-history');" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition-all border border-blue-200">
-          <i data-lucide="users" class="w-3.5 h-3.5"></i>
-          <span id="total-participants-btn">총 0명 참여 (응답 내역 보기)</span>
-          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-        </button>
+        
+        <div class="flex items-center gap-2">
+          <!-- 초기화 버튼 -->
+          <button onclick="showResetConfirmModal()" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition-all border border-red-200 flex items-center gap-1" title="모든 응답 데이터 초기화">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            초기화
+          </button>
+          
+          <!-- 클릭 가능한 참여 인원 버튼 -->
+          <button onclick="renderHistoryTable(); goToScreen('screen-history');" class="flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition-all border border-blue-200">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span id="total-participants-btn">총 0명 참여</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
       </div>
 
       <div class="space-y-6">
@@ -196,7 +213,7 @@
             성별 분포
           </h3>
           <div id="gender-stats" class="space-y-2">
-            <!-- JS로 동적 생성 -->
+            <!-- JS 동적 생성 -->
           </div>
         </div>
 
@@ -207,7 +224,7 @@
             연령대 분포
           </h3>
           <div id="age-stats" class="space-y-2">
-            <!-- JS로 동적 생성 -->
+            <!-- JS 동적 생성 -->
           </div>
         </div>
 
@@ -218,7 +235,7 @@
             개인정보 수집 동의 분포
           </h3>
           <div id="privacy-stats" class="space-y-2">
-            <!-- JS로 동적 생성 -->
+            <!-- JS 동적 생성 -->
           </div>
         </div>
       </div>
@@ -239,9 +256,15 @@
           <h2 class="text-xl font-bold text-slate-900">응답 내역 히스토리</h2>
           <p class="text-xs text-slate-400 mt-0.5">제출된 개별 설문 응답 목록입니다.</p>
         </div>
-        <span id="history-count" class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md">
-          총 0건
-        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="showResetConfirmModal()" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-md transition-all border border-red-200 flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+            초기화
+          </button>
+          <span id="history-count" class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md">
+            총 0건
+          </span>
+        </div>
       </div>
 
       <!-- 히스토리 테이블 영역 -->
@@ -251,13 +274,14 @@
             <tr>
               <th scope="col" class="px-3 py-2.5">#</th>
               <th scope="col" class="px-3 py-2.5">제출 시간</th>
+              <th scope="col" class="px-3 py-2.5">이름</th>
               <th scope="col" class="px-3 py-2.5">성별</th>
               <th scope="col" class="px-3 py-2.5">나이대</th>
               <th scope="col" class="px-3 py-2.5">개인정보 동의</th>
             </tr>
           </thead>
           <tbody id="history-tbody" class="divide-y divide-slate-100">
-            <!-- JS로 동적 생성 -->
+            <!-- JS 동적 생성 -->
           </tbody>
         </table>
       </div>
@@ -305,6 +329,25 @@
     </div>
   </div>
 
+  <!-- 초기화 확인 모달 -->
+  <div id="reset-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl fade-in">
+      <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="trash-2" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900 mb-2">데이터 초기화</h3>
+      <p class="text-sm text-slate-500 mb-6">수집된 모든 설문 응답 내역이 지워집니다.<br>정말로 초기화하시겠습니까?</p>
+      <div class="flex gap-2">
+        <button onclick="closeResetModal()" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all">
+          취소
+        </button>
+        <button onclick="executeResetData()" class="w-1/2 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all">
+          초기화
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // 아이콘 초기화
     lucide.createIcons();
@@ -338,9 +381,10 @@
     // 설문 진행도 업데이트
     function updateProgress() {
       const form = document.getElementById('survey-form');
-      const totalQuestions = 3;
+      const totalQuestions = 4;
       let answeredCount = 0;
 
+      if (form.userName.value.trim() !== '') answeredCount++;
       if (form.gender.value) answeredCount++;
       if (form.ageGroup.value) answeredCount++;
       if (form.privacyAgreement.value) answeredCount++;
@@ -355,51 +399,50 @@
       event.preventDefault();
       const form = document.getElementById('survey-form');
 
+      const userName = form.userName.value.trim();
       const gender = form.gender.value;
       const ageGroup = form.ageGroup.value;
       const privacyAgreement = form.privacyAgreement.value;
 
-      // 1번 및 2번 성별/나이대 누락 검증
+      if (!userName) {
+        showAlertModal('이름을 입력해 주세요.');
+        return;
+      }
+
       if (!gender || !ageGroup) {
         showAlertModal('성별과 나이대를 선택해 주세요.');
         return;
       }
 
-      // 3번 개인정보 수집동의 미선택 검증
       if (!privacyAgreement) {
         showAlertModal('개인정보 수집 동의 여부를 선택해 주세요.');
         return;
       }
 
-      // 데이터 저장
       const now = new Date();
       const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       
       saveSurveyResponse({
         timestamp,
+        userName,
         gender,
         ageGroup,
         privacyAgreement
       });
 
-      // 성공 모달 출력
       document.getElementById('success-modal').classList.remove('hidden');
     }
 
-    // 완료 모달 확인 누르면 메인으로 이동 & 폼 초기화
     function confirmSuccessModal() {
       document.getElementById('success-modal').classList.add('hidden');
       
-      // 폼 초기화 및 프로그레스바 리셋
       const form = document.getElementById('survey-form');
       form.reset();
       updateProgress();
 
-      // 메인 화면으로 이동
       goToScreen('screen-main');
     }
 
-    // 경고 모달 제어
     function showAlertModal(msg) {
       document.getElementById('alert-message').innerText = msg;
       document.getElementById('alert-modal').classList.remove('hidden');
@@ -409,18 +452,33 @@
       document.getElementById('alert-modal').classList.add('hidden');
     }
 
+    // 데이터 초기화 모달 제어
+    function showResetConfirmModal() {
+      document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
+
+    // 실제 데이터 초기화 실행
+    function executeResetData() {
+      localStorage.removeItem('survey_responses');
+      closeResetModal();
+
+      renderResults();
+      renderHistoryTable();
+    }
+
     // 결과 통계 계산 및 렌더링
     function renderResults() {
       const surveys = getStoredSurveys();
       const total = surveys.length;
 
-      document.getElementById('total-participants-btn').innerText = `총 ${total}명 참여 (응답 내역 보기)`;
+      document.getElementById('total-participants-btn').innerText = `총 ${total}명 참여`;
 
-      // 성별 카운트
       const genderCounts = { '남성': 0, '여성': 0 };
-      // 연령대 카운트
       const ageCounts = { '0~8': 0, '9~13': 0, '14~16': 0, '17~19': 0, '20~24': 0, '성인': 0 };
-      // 동의 여부 카운트
       const privacyCounts = { '동의함': 0, '동의하지 않음': 0 };
 
       surveys.forEach(s => {
@@ -429,11 +487,8 @@
         if (privacyCounts[s.privacyAgreement] !== undefined) privacyCounts[s.privacyAgreement]++;
       });
 
-      // 성별 UI 생성
       renderStatCategory('gender-stats', genderCounts, total, ['남성', '여성']);
-      // 연령대 UI 생성
       renderStatCategory('age-stats', ageCounts, total, ['0~8', '9~13', '14~16', '17~19', '20~24', '성인'], '세');
-      // 개인정보 동의 UI 생성
       renderStatCategory('privacy-stats', privacyCounts, total, ['동의함', '동의하지 않음']);
     }
 
@@ -471,7 +526,7 @@
       if (surveys.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="px-3 py-6 text-center text-slate-400">
+            <td colspan="6" class="px-3 py-6 text-center text-slate-400">
               아직 제출된 응답 내역이 없습니다.
             </td>
           </tr>
@@ -479,7 +534,6 @@
         return;
       }
 
-      // 최신 제출 응답이 위로 오도록 역순 출력
       surveys.slice().reverse().forEach((item, index) => {
         const rowNum = surveys.length - index;
         const isAgreed = item.privacyAgreement === '동의함';
@@ -489,6 +543,7 @@
           <tr class="hover:bg-slate-50 transition-colors">
             <td class="px-3 py-2.5 font-semibold text-slate-400">${rowNum}</td>
             <td class="px-3 py-2.5 text-slate-500">${item.timestamp}</td>
+            <td class="px-3 py-2.5 font-bold text-slate-900">${item.userName || '-'}</td>
             <td class="px-3 py-2.5 font-medium text-slate-800">${item.gender}</td>
             <td class="px-3 py-2.5 font-medium text-slate-800">${item.ageGroup}${item.ageGroup !== '성인' ? '세' : ''}</td>
             <td class="px-3 py-2.5">
